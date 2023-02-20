@@ -58,7 +58,7 @@ const drawLine = function(x1, y1, x2, y2) {
         } else { // Line is drawn right to left (swap ends)
             x = x2; y = y2; xe = x1;
         }
-        pixel(x, y); // Draw first pixel
+        pixel_map[y][x] = 'green'; // Draw first pixel
         // Rasterize the line
         for (i = 0; x < xe; i++) {
             x = x + 1;
@@ -104,15 +104,51 @@ const drawLine = function(x1, y1, x2, y2) {
             pixel_map[y][x] = 'green';
         }
     }
- }
+}
 
- drawLine(3, 3, 6, 7);
+let mousePressed = false;
+let fromX = 0;
+let fromY = 0;
+let toX = 0;
+let toY = 0;
 
+canvas.addEventListener("click", function(e) {
+    const localX = Math.floor(e.clientX / PIXEL_SIZE);
+    const localY = Math.floor(e.clientY / PIXEL_SIZE);
+    
+    if (localX < WIDTH && localY < HEIGHT) {
+        fromX = localX;
+        fromY = localY;
+        mousePressed = !mousePressed;
+    }
+    console.log(pixel_map);
+});
+
+canvas.addEventListener("mousemove", function(e) {
+    const localX = Math.floor(e.clientX / PIXEL_SIZE);
+    const localY = Math.floor(e.clientY / PIXEL_SIZE);
+
+    if (localX < WIDTH && localY < HEIGHT) {
+        toX = localX;
+        toY = localY;
+    }
+});
 
 function animate() {
     requestAnimationFrame(animate)
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
     drawScreen(pixel_map);
+    for (let i = 0; i < HEIGHT; i++) {
+        for (let j = 0; j < WIDTH; j++) {
+            pixel_map[i][j] = 'black';
+        }
+    }
+
+    if (mousePressed) {
+        drawLine(fromX, fromY, toX, toY);
+        // console.log(buffer_map);
+    }
 }
 
 animate();
